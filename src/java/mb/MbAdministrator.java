@@ -60,6 +60,7 @@ public class MbAdministrator implements Serializable {
         administrator = new Administrator();
         gameList = getEjbGame().findAll();
         usersList = getEjbUser().findAll();
+        filteredGamesList = gameList; 
         balanceIncrement = "0"; 
     }
 
@@ -140,6 +141,10 @@ public class MbAdministrator implements Serializable {
     }
 
     public void setSelectedGame(Game selectedGame) {
+        if(selectedGame == null){
+            return;
+        }
+        this.selectedGame = selectedGame;
         String result = selectedGame.getScore();
         if (result.isEmpty()) {
             homeGoals = "";
@@ -149,7 +154,6 @@ public class MbAdministrator implements Serializable {
             homeGoals = resultArray[0];
             awayGoals = resultArray[1];
         }
-        this.selectedGame = selectedGame;
     }
     
     public void setDefaultUserBalanceTableValue(){
