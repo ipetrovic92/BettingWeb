@@ -1,0 +1,280 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="./WEB-INF/templates/bettingTemplate.xhtml">
+
+            <ui:define name="content">
+                <span>
+                    <h:form id="userInformation">
+                        <h:panelGrid columns="4">
+                            <p:outputLabel styleClass="userInformationClass" value="#{msg.User}: #{mbUser.user.firstName} #{mbUser.user.lastName}"/>
+                            <p:outputLabel styleClass="userInformationClass" value="#{msg.UserLabel_email} #{mbUser.user.email}"/>
+                            <p:outputLabel styleClass="userInformationClass" value="#{msg.UserLabel_balance} #{mbUser.user.balance}" />
+                            <p:commandButton id="logOutButton"  value="#{msg.LogOut}" action="#{mbUser.logOut}"/>
+                        </h:panelGrid>
+                    </h:form>
+                </span>
+
+                <h:form id="TicketListForm">
+                    <p:panel header="#{msg.UserListOfTickets_label}">
+                        <p:dataTable id="tikcetList" value="#{mbUser.userTickets}" var="ticket"
+                                     selectionMode="single" selection="#{mbUser.selectedTicket}"
+                                     paginator="true" rowKey="#{ticket.ticketPK}" rows="10"
+                                     rowsPerPageTemplate="10,20,30,40,50" emptyMessage="#{msg.UserListOfTickets_emptyListMessage}">
+
+                            <p:ajax event="rowSelect" oncomplete="PF('TicketViewDialog').show()" update="TicketViewDlg"/>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserListOfTickets_ticketId}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticket.ticketPK.id}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserListOfTickets_paymentTime}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticket.paymentTime}">
+                                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserListOfTickets_stake}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticket.stake}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserListOfTickets_totalOdds}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticket.totalOdds}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserListOfTickets_potentialWinnings}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticket.potentialWinnings}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserListOfTickets_status}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticket.status.status}"/>
+                            </p:column>
+                            <f:facet name="footer">     
+                                <p:commandButton id="createTicketButton" icon="ui-icon-plus" value="#{msg.UserListOfTickets_createNew}" actionListener="#{mbUser.prepareTicketCreation}" oncomplete="PF('TicketCreateDialog').show()" update="TicketCreateDlg"/>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:panel>
+                </h:form>
+
+                <p:dialog id="TicketViewDlg" widgetVar="TicketViewDialog" closeOnEscape="true" modal="true" resizable="false" appendTo="@(body)" header="#{msg.UserViewTicket_label}: #{mbUser.selectedTicket.ticketPK.id}">
+                    <h:form prependId="false">
+                        <p:dataTable id="ticketMatchList" value="#{mbUser.selectedTicket.ticketMatchList}" var="ticketMatch"
+                                     selectionMode="single" paginator="false" 
+                                     rowKey="#{ticketMatch.ticketMatchPK}" emptyMessage="#{msg.UserViewTicket_emptyListMessage}">
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserViewTicket_gameTime}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticketMatch.game.gameTime}">
+                                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserViewTicket_homeTeam}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticketMatch.game.homeTeam.name}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserViewTicket_awayTeam}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticketMatch.game.awayTeam.name}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserViewTicket_resultPrediction}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticketMatch.resultPrediction}">
+                                    <f:converter converterId="resultPredictionConverter"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserViewTicket_odds}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticketMatch.odd}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.UserViewTicket_status}"/>
+                                </f:facet>
+                                <h:outputText value="#{ticketMatch.status.status}"/>
+                            </p:column>
+                            <f:facet id="ticketViewFooter" name="footer" >
+                                <h:outputText value="#{msg.UserViewTicket_totalOddsLabel}"/>
+                                <h:outputText styleClass="ticketAmountInformation" value="#{mbUser.selectedTicket.totalOdds}"/>
+                                <h:outputText value="#{msg.UserViewTicket_stakeLabel}"/>
+                                <h:outputText styleClass="ticketAmountInformation" value="#{mbUser.selectedTicket.stake}"/>
+                                <h:outputText value="#{msg.UserViewTicket_potentialWinningsLabel}"/>
+                                <h:outputText value="#{mbUser.selectedTicket.potentialWinnings}"/>
+                                <div>
+                                    <p:commandButton id="cancelTicketViewButton" value="#{msg.Cancel}" oncomplete="PF('TicketViewDialog').hide()"/>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:form>
+                </p:dialog>
+
+
+                <p:dialog id="TicketCreateDlg" widgetVar="TicketCreateDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msg.UserCreateTicket_title}">
+                    <h:form prependId="false">
+                        <h:inputText id="tableCellValue" value="#{mbUser.selectedDataTableValue}" style="display:none">
+                            <p:ajax listener="#{mbUser.onGameSelected()}" update="ticketGameListForm,ticketGameListForm:ticketGamesList"></p:ajax>
+                        </h:inputText> 
+                        <p:panel header="#{msg.UserCreateTicket_titleGames}">
+                            <p:dataTable id="gamesList" value="#{mbUser.notStartedGameList}" var="game"
+                                         selectionMode="single"
+                                         paginator="true" rowKey="#{game.id}" rows="10"
+                                         rowsPerPageTemplate="10,20,30,40,50" emptyMessage="#{msg.UserCreateTicket_emptyListMessage}"
+                                         >
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_id}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{game.id}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_gameTime}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{game.gameTime}">
+                                        <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_homeTeam}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{game.homeTeam.name}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_awayTeam}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{game.awayTeam.name}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_homeOdds}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{game.homeOdds}" />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_drawOdds}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{game.drawOdds}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_awayOdds}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{game.awayOdds}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                    </h:form>
+
+                    <h:form id="ticketGameListForm">
+                        <p:panel id="ticketGameListPanel" header="#{msg.UserCreateTicket_titleSelectedGames}">
+                            <p:dataTable id="ticketGamesList" value="#{mbUser.newTicketGames}" var="ticketMatch"
+                                         selectionMode="single" selection="#{mbUser.ticketMatchToRemove}"
+                                         paginator="false" rowKey="#{ticketMatch.ticketMatchPK}"
+                                         emptyMessage="#{msg.UserCreateTicket_emptyListMessage}">
+
+                                <p:ajax event="rowSelect" update="ticketGameListForm,ticketGameListForm:ticketGamesList"/>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_id}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{ticketMatch.game.id}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_gameTime}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{ticketMatch.game.gameTime}">
+                                        <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_homeTeam}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{ticketMatch.game.homeTeam.name}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_awayTeam}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{ticketMatch.game.awayTeam.name}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_resultPrediction}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{ticketMatch.resultPrediction}">
+                                        <f:converter converterId="resultPredictionConverter"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.UserCreateTicket_odds}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{ticketMatch.odd}"/>
+                                </p:column>
+                                <f:facet id="ticketGameListFormFooter" name="footer" >
+                                    <div>
+                                        <p:outputLabel value="#{msg.UserCreateTicket_totalOdds}"/>
+                                        <p:outputLabel styleClass="ticketAmountInformation" value="#{mbUser.selectedTicket.totalOdds}"/>
+                                        <p:outputLabel value="#{msg.UserCreateTicket_stake}"/>
+                                        <p:inputText styleClass="ticketAmountInformation" id="newTicketStake"  value="#{mbUser.selectedTicket.stake}" title="#{msg.UserCreateTicket_stakeTitle}" required="true" style="width: 100px;" requiredMessage="#{msg.UserCreateTicketRequiredMessage_stake}">
+                                            <p:ajax event="keyup" listener="#{mbUser.calculatePotentialWinnings()}" update="ticketGameListForm:ticketGamesList"/>
+                                        </p:inputText>
+                                        <p:outputLabel value="#{msg.UserCreateTicket_potentialWinningsLabel}"/>
+                                        <p:outputLabel styleClass="ticketAmountInformation" value="#{mbUser.selectedTicket.potentialWinnings}"/>
+                                    </div>
+                                    <div>
+                                        <p:commandButton id="saveTicketButton" value="#{msg.Save}" actionListener="#{mbUser.saveTicket}" oncomplete="PF('TicketCreateDialog').hide()" update="TicketListForm,growlSuccess,growlError,:userInformation"/>
+                                        <p:commandButton id="cancelTicketButton" value="#{msg.Cancel}" oncomplete="PF('TicketCreateDialog').hide()" update="TicketListForm"/>
+                                    </div>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </h:form>
+                </p:dialog>
+
+
+            </ui:define>
+
+            <ui:define name="bottom">
+                bottom
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

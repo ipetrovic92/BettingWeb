@@ -1,0 +1,200 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="./WEB-INF/templates/bettingTemplate.xhtml">
+
+            <ui:define name="content">
+                <span>
+                    <h:form>
+                        <h:panelGrid columns="4">
+                            <p:outputLabel styleClass="administratorInformation" value="#{msg.Administrator}: #{mbAdministrator.administrator.firstName} #{mbAdministrator.administrator.lastName}"/>
+                            <p:outputLabel styleClass="administratorInformation" value="#{msg.AdministratorLabel_email} #{mbAdministrator.administrator.email}"/>
+                            <p:commandButton value="#{msg.AdministratorUserBalance_button}" oncomplete="PF('UserBalanceDialog').show()" update=":UserBalanceDlg"/>
+                            <p:commandButton styleClass="logOutButton"  value="#{msg.LogOut}" action="#{mbAdministrator.logOut()}" />
+                        </h:panelGrid>
+                    </h:form>
+                </span>
+
+                <p:dialog id="UserBalanceDlg" widgetVar="UserBalanceDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msg.AdministratorUserBalance_label}" closable="false" closeOnEscape="false">
+                    <h:form id="UserBalanceForm">
+                        <p:dataTable id="userList" value="#{mbAdministrator.usersList}" var="user" widgetVar="userListTable"
+                                     selectionMode="single" selection="#{mbAdministrator.selectedUser}"
+                                     paginator="true"
+                                     rowKey="#{user.email}" emptyMessage="#{msg.AdministratorUserBalance_emptyListMessage}"
+                                     rows="10" filteredValue="#{mbAdministrator.filteredUsersList}"
+                                     rowsPerPageTemplate="10,20,30,40,50">
+
+                            <p:column filterBy="#{user.email}" filterMatchMode="contains"> 
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorUserBalance_email}"/>
+                                </f:facet>
+                                <h:outputText value="#{user.email}"/>
+                            </p:column>
+                            <p:column filterBy="#{user.firstName}" filterMatchMode="contains">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorUserBalance_firstName}"/>
+                                </f:facet>
+                                <h:outputText value="#{user.firstName}"/>
+                            </p:column>
+                            <p:column filterBy="#{user.lastName}" filterMatchMode="contains">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorUserBalance_lastName}"/>
+                                </f:facet>
+                                <h:outputText value="#{user.lastName}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorUserBalance_currentBalance}"/>
+                                </f:facet>
+                                <h:outputText value="#{user.balance}"/>
+                            </p:column>
+                            <f:facet name="footer">
+                                <div>
+                                    <p:outputLabel value="#{msg.AdministratorUserBalance_increaseBalance}"/>
+                                    <p:inputText id="increaseBalanceId" styleClass="increseUserBalance" value="#{mbAdministrator.balanceIncrement}" title="#{msg.AdministratorUserBalance_increaseBalanceLabel}" required="true" style="width: 100px;" requiredMessage="#{msg.AdministratorUserBalanceRequiredMessage_increaseBalance}">
+                                        <p:keyFilter for="increaseBalanceId" mask="num" /> 
+                                    </p:inputText>
+                                </div>
+                                <div>
+                                    <p:commandButton id="saveUserBalanceButton" value="#{msg.Save}" actionListener="#{mbAdministrator.increaseUserBalance}" oncomplete="PF('UserBalanceDialog').hide()" update="UserBalanceForm,growlSuccess,growlError"/>
+                                    <p:commandButton id="cancelTicketButton" value="#{msg.Cancel}"  actionListener="#{mbAdministrator.setDefaultUserBalanceTableValue()}" oncomplete="PF('UserBalanceDialog').hide()" update="UserBalanceForm"/>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:form>
+                </p:dialog>
+
+
+                <h:form id="GameListForm">
+                    <p:panel header="#{msg.AdministratorViewGames_label}">
+                        <p:dataTable id="gameList" value="#{mbAdministrator.gameList}" var="game" widgetVar="gameDataTable"
+                                     selectionMode="single" selection="#{mbAdministrator.selectedGame}"
+                                     paginator="true" rowKey="#{game.id}" rows="10" rowsPerPageTemplate="10,20,30,40,50" 
+                                     filteredValue="#{mbAdministrator.filteredGamesList}" emptyMessage="#{msg.AdministratorViewGames_emptyListMessage}"
+                                     >
+                            <f:facet name="header">
+                                <p:outputPanel>
+                                    <h:outputText value="#{msg.Search}" />
+                                    <p:inputText id="globalFilter" onkeyup="PF('gameDataTable').filter()" style="width:150px" placeholder="#{msg.EnterKeyword}"/>
+                                </p:outputPanel>
+                            </f:facet>
+
+                            <p:ajax event="rowSelect" oncomplete="PF('GameEditDialog').show()" update="GameEditDlg"/>
+
+                            <p:column sortBy="#{game.gameTime}">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorViewGames_gameTime}"/>
+                                </f:facet>
+                                <h:outputText value="#{game.gameTime}">
+                                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column filterBy="#{game.id}" filterMatchMode="contains">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorViewGames_gameId}"/>
+                                </f:facet>
+                                <h:outputText value="#{game.id}"/>
+                            </p:column>
+                            <p:column filterBy="#{game.homeTeam.name}" filterMatchMode="contains">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorViewGames_homeTeam}"/>
+                                </f:facet>
+                                <h:outputText value="#{game.homeTeam.name}"/>
+                            </p:column>
+                            <p:column filterBy="#{game.awayTeam.name}" filterMatchMode="contains">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorViewGames_awayTeam}"/>
+                                </f:facet>
+                                <h:outputText value="#{game.awayTeam.name}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorViewGames_homeOdds}"/>
+                                </f:facet>
+                                <h:outputText value="#{game.homeOdds}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorViewGames_drawOdds}"/>
+                                </f:facet>
+                                <h:outputText value="#{game.drawOdds}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorViewGames_awayOdds}"/>
+                                </f:facet>
+                                <h:outputText value="#{game.awayOdds}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorViewGames_result}"/>
+                                </f:facet>
+                                <h:outputText value="#{game.score}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.AdministratorViewGames_processingStatus}"/>
+                                </f:facet>
+                                <h:outputText value="#{game.processingStatus.processingOutcome}"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:panel>
+                </h:form>
+
+                <p:dialog id="GameEditDlg" widgetVar="GameEditDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msg.AdministratorGameEdit_label}">
+                    <h:form id="GameEditForm">
+                        <h:panelGroup id="display" style="width: 350px;">
+                            <h:panelGrid columns="2" cellpadding="10">
+                                <p:outputLabel value="#{msg.AdministratorGameEdit_gameId}"/>
+                                <p:outputLabel value="#{mbAdministrator.selectedGame.id}"/>
+                                <p:outputLabel value="#{msg.AdministratorGameEdit_gameTime}"/>
+                                <p:outputLabel value="#{mbAdministrator.selectedGame.gameTime}">
+                                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                                </p:outputLabel>
+                                <p:outputLabel value="#{msg.AdministratorGameEdit_homeTeam}"/>
+                                <p:outputLabel value="#{mbAdministrator.selectedGame.homeTeam.name}"/>
+                                <p:outputLabel value="#{msg.AdministratorGameEdit_awayTeam}"/>
+                                <p:outputLabel value="#{mbAdministrator.selectedGame.awayTeam.name}"/>
+                            </h:panelGrid>
+                            <h:panelGrid columns="3" cellspacing="10">
+                                <p:outputLabel styleClass="GameEditDlgOdds" value="#{msg.AdministratorGameEdit_homeOdds}"/>
+                                <p:outputLabel styleClass="GameEditDlgOdds" value="#{mbAdministrator.selectedGame.homeOdds}"/>
+                                <p:outputLabel styleClass="GameEditDlgOdds" value="#{msg.AdministratorGameEdit_drawOdds}"/>
+                                <p:outputLabel styleClass="GameEditDlgOdds" value="#{mbAdministrator.selectedGame.drawOdds}"/>
+                                <p:outputLabel styleClass="GameEditDlgOdds" value="#{msg.AdministratorGameEdit_awayOdds}"/>
+                                <p:outputLabel styleClass="GameEditDlgOdds" value="#{mbAdministrator.selectedGame.awayOdds}"/>
+                            </h:panelGrid>
+                            <h:panelGrid columns="2" cellpadding="5" >
+                                <p:outputLabel value="#{msg.AdministratorGameEdit_homeGoals}"/>
+                                <p:spinner id="homeGoalsId" value="#{mbAdministrator.homeGoals}" stepFactor="1" min="0" max="15" >
+                                    <p:ajax update="display" process="@this" />
+                                </p:spinner>
+                                <p:outputLabel value="#{msg.AdministratorGameEdit_awayGoals}"/>
+                                <p:spinner id="awayGoalsId" value="#{mbAdministrator.awayGoals}" stepFactor="1" min="0" max="15">
+                                    <p:ajax update="display" process="@this" />
+                                </p:spinner>
+                            </h:panelGrid>
+                        </h:panelGroup>
+                        <p:commandButton actionListener="#{mbAdministrator.saveGameScore}" value="#{msg.Save}" oncomplete="PF('GameEditDialog').hide()" update="GameListForm,growlSuccess,growlError"/>
+                        <p:commandButton value="#{msg.Cancel}" onclick="PF('GameEditDialog').hide()"/>
+                    </h:form>
+                </p:dialog> 
+
+            </ui:define>
+
+            <ui:define name="bottom">
+                bottom
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

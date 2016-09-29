@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="./css/default.css"/>
+        <h:outputStylesheet name="./css/cssLayout.css"/>
+        <link rel="stylesheet" type="text/css" href="./resources/css/custom.css"/>
+        <h:outputScript name="./js/utils.js"/>
+        <title>#{msg.Title}</title>
+    </h:head>
+
+    <h:body>
+        <p:growl id="growlSuccess" life="3000" globalOnly="true" showDetail="false" for="successInfo"/>
+        <p:growl id="growlError" life="3000" showDetail="false" for="errorInfo"/>
+
+        <div id="top">
+            <ui:insert name="top">
+                <div id="languageDivId">
+                    <h:form id="language">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.Language}"/>
+                            <h:selectOneMenu value="#{language.localeCode}" onchange="submit()"
+                                             valueChangeListener="#{language.countryLocaleCodeChanged}">
+                                <f:selectItems value="#{language.countries}" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                    </h:form>
+                </div>
+            </ui:insert>
+        </div>
+
+        <div id="content" class="center_content">
+            <ui:insert name="content">Content</ui:insert>
+        </div>
+    </h:body>
+
+</html>

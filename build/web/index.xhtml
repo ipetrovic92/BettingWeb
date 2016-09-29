@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="./WEB-INF/templates/bettingTemplate.xhtml">
+
+            <ui:define name="top">
+                <h:form id="language">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.Language}"/>
+                            <h:selectOneMenu value="#{language.localeCode}" onchange="submit()"
+                                             valueChangeListener="#{language.countryLocaleCodeChanged}">
+                                <f:selectItems value="#{language.countries}" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                    </h:form>
+            </ui:define>
+
+            <ui:define name="content">
+                <h:form id="frmIndex">
+                    <div >
+                        <h2>
+                            <p:commandButton id="AdministratorLogIn" styleClass="indexButton" value="#{msg.LogInAdministrator}" onclick="PF('AdministratorLogInDialog').show()" oncomplete="resetForm('AdministratorLogInForm', 'buttonAdminLogInSubmit');" style=" background-image: url(resources/images/admin.png) !important;"/>
+                            <p:commandButton id="UserLogIn" styleClass="indexButton" value="#{msg.LogInUser}" onclick="PF('UserLogInDialog').show()" oncomplete="resetForm('UserLogInForm', 'buttonUserLogInSubmit');" style=" background-image: url(resources/images/user.png) !important;"/>
+                            <p:commandButton id="UserRegistration" styleClass="indexButton" value="#{msg.RegistrationUser}" onclick="PF('UserRegistrationDialog').show()" oncomplete="resetForm('UserRegistrationForm', 'buttonUserRegistrationSubmit');" style="background-image: url(resources/images/add_user.png) !important;"/>
+                        </h2>
+                    </div>
+                </h:form>
+
+                <p:dialog id="AdministratorLogInDlg" widgetVar="AdministratorLogInDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msg.LogInAdministratorTitle}" closable="false">
+                    <h:form id="AdministratorLogInForm" >
+                        <h:panelGroup id="display" >
+                            <h:panelGrid columns="3" cellspacing="10">
+                                <p:outputLabel value="#{msg.LogInAdministratorLabel_email}" for="email"/>
+                                <p:inputText id="email" value="#{mbAdministrator.administrator.email}" title="#{msg.LogInAdministratorTitle_email}" required="true" requiredMessage="#{msg.LogInAdministratorRequiredMessage_email}"
+                                             onkeyup="validateForm('AdministratorLogInForm', 'buttonAdminLogInSubmit');">
+                                    <p:focus for="email"/>
+                                    <p:ajax event="keyup" update="msgEmail" />
+                                </p:inputText>
+                                <p:messages id="msgEmail" for="email" />
+
+                                <p:outputLabel value="#{msg.LogInAdministratorLabel_password}" for="password"/>
+                                <p:password id="password" value="#{mbAdministrator.administrator.password}" title="#{msg.LogInAdministratorTitle_password}" required="true" requiredMessage="#{msg.LogInAdministratorRequiredMessage_password}"
+                                            onkeyup="validateForm('AdministratorLogInForm', 'buttonAdminLogInSubmit');">
+                                    <p:ajax event="keyup" update="msgPassword" />
+                                </p:password>
+                                <p:messages id="msgPassword" for="password" />
+                            </h:panelGrid>
+                            
+                            <p:commandButton id="btnSubmit" value="#{msg.LogIn}" widgetVar="buttonAdminLogInSubmit" action="#{mbAdministrator.logIn()}" ajax="false" disabled="false">
+                                <p:ajax update="display" resetValues="true" />
+                            </p:commandButton>
+                            <p:commandButton id="btnCancel" value="#{msg.Cancel}" onclick="PF('AdministratorLogInDialog').hide()" type="button"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+
+                <p:dialog id="UserLogInDlg" widgetVar="UserLogInDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msg.LogInUserTitle}" closable="false">
+                    <h:form id="UserLogInForm" >
+                        <h:panelGroup id="display" >
+                            <h:panelGrid columns="3" cellspacing="10">
+                                <p:outputLabel value="#{msg.LogInUserLabel_email}" for="email"/>
+                                <p:inputText id="email" value="#{mbUser.user.email}" title="#{msg.LogInUserTitle_email}" required="true" requiredMessage="#{msg.LogInUserRequiredMessage_email}"
+                                             onkeyup="validateForm('UserLogInForm', 'buttonUserLogInSubmit');">
+                                    <p:focus for="email"/>
+                                    <p:ajax event="keyup" update="msgEmail" />
+                                </p:inputText>
+                                <p:messages id="msgEmail" for="email" />
+                                
+                                <p:outputLabel value="#{msg.LogInUserLabel_password}" for="password"/>
+                                <p:password id="password" value="#{mbUser.user.password}" title="#{msg.LogInUserTitle_password}" required="true" requiredMessage="#{msg.LogInUserRequiredMessage_password}"
+                                            onkeyup="validateForm('UserLogInForm', 'buttonUserLogInSubmit');">
+                                    <p:ajax event="keyup" update="msgPassword" />
+                                </p:password>
+                                <p:messages id="msgPassword" for="password" />
+                            </h:panelGrid>
+                            <p:commandButton id="btnSubmit" value="#{msg.LogIn}" widgetVar="buttonUserLogInSubmit" action="#{mbUser.logIn()}" ajax="false" disabled="false">
+                                <p:ajax update="display" resetValues="true" />
+                            </p:commandButton>
+                            <p:commandButton id="btnCancel" value="#{msg.Cancel}" onclick="PF('UserLogInDialog').hide()" type="button"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+
+                <p:dialog id="UserRegistrationDlg" widgetVar="UserRegistrationDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msg.RegistrationUserTitle}" closable="false" >
+                    <h:form id="UserRegistrationForm" >
+                        <h:panelGroup id="display" >
+                            <h:panelGrid columns="3" cellspacing="10">
+                                <p:outputLabel value="#{msg.RegistrationUserLabel_email}" for="email"/>
+                                <p:inputText id="email" value="#{mbUser.user.email}" title="#{msg.RegistrationUserTitle_email}" required="true" requiredMessage="#{msg.RegistrationUserRequiredMessage_email}"
+                                             onkeyup="validateForm('UserRegistrationForm', 'buttonUserRegistrationSubmit');">
+                                    <p:focus for="email"/>
+                                    <p:ajax event="keyup" update="msgEmail" />
+                                </p:inputText>
+                                <p:messages id="msgEmail" for="email" />
+
+                                <p:outputLabel value="#{msg.RegistrationUserLabel_firstName}" for="firstName"/>
+                                <p:inputText id="firstName" value="#{mbUser.user.firstName}" title="#{msg.RegistrationUserTitle_firstName}" required="true" requiredMessage="#{msg.RegistrationUserRequiredMessage_firstName}"
+                                            onkeyup="validateForm('UserRegistrationForm', 'buttonUserRegistrationSubmit');">
+                                    <p:ajax event="keyup" update="msgFirstName" />
+                                </p:inputText>
+                                <p:messages id="msgFirstName" for="firstName" />
+
+                                <p:outputLabel value="#{msg.RegistrationUserLabel_lastName}" for="lastName"/>
+                                <p:inputText id="lastName" value="#{mbUser.user.lastName}" title="#{msg.RegistrationUserTitle_lastName}" required="true" requiredMessage="#{msg.RegistrationUserRequiredMessage_lastName}"
+                                            onkeyup="validateForm('UserRegistrationForm', 'buttonUserRegistrationSubmit');">
+                                    <p:ajax event="keyup" update="msgLastName" />
+                                </p:inputText>
+                                <p:messages id="msgLastName" for="lastName" />
+
+                                <p:outputLabel value="#{msg.RegistrationUserLabel_dateOfBirth}" for="dateOfBirth"/>
+                                <p:calendar id="dateOfBirth" pattern="dd.MM.yyyy" value="#{mbUser.user.dateOfBirth}" title="#{msg.RegistrationUserTitle_dateOfBirth}" required="true" requiredMessage="#{msg.RegistrationUserRequiredMessage_dateOfBirth}"
+                                            onkeyup="validateForm('UserRegistrationForm', 'buttonUserRegistrationSubmit');" onblur="validateForm('UserRegistrationForm', 'buttonUserRegistrationSubmit');">
+                                    <p:ajax event="keyup" update="msgDateOfBirth" />
+                                    <p:ajax event="dateSelect" listener="#{validationUtil.onDateSelect}" update="msgDateOfBirth" oncomplete="validateForm('UserRegistrationForm', 'buttonUserRegistrationSubmit');"/>
+                                </p:calendar>
+                                <p:messages id="msgDateOfBirth" for="dateOfBirth" />
+
+                                <p:outputLabel value="#{msg.RegistrationUserLabel_password}" for="password"/>
+                                <p:password id="password" value="#{mbUser.user.password}" title="#{msg.RegistrationUserTitle_password}" required="true" requiredMessage="#{msg.RegistrationUserRequiredMessage_password}"
+                                            onkeyup="validateForm('UserRegistrationForm', 'buttonUserRegistrationSubmit');">
+                                    <p:ajax event="keyup" update="msgPassword" />
+                                </p:password>
+                                <p:messages id="msgPassword" for="password" />
+                            </h:panelGrid>
+
+                            <p:commandButton id="btnSubmit" value="#{msg.Register}" widgetVar="buttonUserRegistrationSubmit" action="#{mbUser.registerNewUser()}" ajax="false" disabled="false">
+                                <p:ajax update="display" resetValues="true" />
+                            </p:commandButton>
+                            <p:commandButton id="btnCancel" value="#{msg.Cancel}" onclick="PF('UserRegistrationDialog').hide()" type="button"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

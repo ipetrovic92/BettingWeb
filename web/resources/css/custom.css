@@ -1,0 +1,55 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Sep 28, 2016, 9:57:25 PM
+    Author     : Ivan
+*/
+
+.indexButton{
+    border:none;
+    margin: auto;
+    width: 256px;
+    height: 300px;
+    padding-top: 275px;
+    margin-left: 150px;
+    margin-top: 50px;
+}
+
+.ui-state-hover, .ui-state-active, .ui-state-focus{
+    background: #fefefe;
+}
+#languageDivId {
+    position: relative;
+    padding-top: 50px;
+    padding-bottom: 10px;
+}
+
+#language {
+    position:absolute;
+    top:0;
+    right:0;
+}
+
+.logOutButton{
+    background-color: #fefefe;
+    margin-left: 20px;
+}
+
+.administratorInformation, .userInformationClass{
+    margin-right: 10px; 
+}
+
+.ticketAmountInformation {
+    margin-right: 30px; 
+}
+
+.GameEditDlgOdds {
+    margin-left: 50px;
+}
+
+#TicketCreateDlg, #TicketViewDlg, #UserBalanceDlg {
+    width: 80% !important;
+}
